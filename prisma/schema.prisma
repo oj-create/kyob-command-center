@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,4 +7,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models will be added here as the project develops
+enum Area {
+  outbound
+  content
+  website
+  general
+}
+
+enum Source {
+  fathom
+  slack
+  manual
+}
+
+enum TaskStatus {
+  open
+  done
+}
+
+enum Priority {
+  blocking
+  normal
+}
+
+enum PostStatus {
+  draft
+  scheduled
+  published
+}
+
+model Task {
+  id        String     @id @default(uuid())
+  title     String
+  area      Area       @default(general)
+  source    Source
+  status    TaskStatus @default(open)
+  priority  Priority?
+  dueDate   DateTime?
+  meetingId String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Post {
+  id            String     @id @default(uuid())
+  externalId    String?    @unique
+  title         String
+  content       String
+  platform      String     @default("linkedin")
+  status        PostStatus @default(draft)
+  scheduledDate DateTime?
+  notes         String?
+  createdAt     DateTime   @default(now())
+}
+
+model ToolRun {
+  id         String   @id @default(uuid())
+  toolName   String
+  launchedAt DateTime @default(now())
+}
