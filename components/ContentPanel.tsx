@@ -19,11 +19,19 @@ const STATUS_BADGE: Record<string, string> = {
 export default function ContentPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/posts")
       .then((r) => r.json())
-      .then(setPosts);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setPosts(data);
+        } else {
+          setFetchError(data.error ?? "Failed to load posts");
+        }
+      })
+      .catch(() => setFetchError("Failed to load posts"));
   }, []);
 
   const filtered =
@@ -49,7 +57,9 @@ export default function ContentPanel() {
           ))}
         </div>
       </div>
-      {filtered.length === 0 ? (
+      {fetchError ? (
+        <p className="text-white/30 text-sm">Posts unavailable</p>
+      ) : filtered.length === 0 ? (
         <p className="text-white/30 text-sm">No posts in queue</p>
       ) : (
         <div className="flex flex-col gap-2">

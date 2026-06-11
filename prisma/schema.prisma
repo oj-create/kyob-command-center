@@ -51,7 +51,7 @@ model Task {
 
 model Post {
   id            String     @id @default(uuid())
-  externalId    String?    @unique
+  externalId    String     @unique
   title         String
   content       String
   platform      String     @default("linkedin")

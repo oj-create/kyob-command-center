@@ -8,7 +8,8 @@ export async function GET() {
   } catch (err) {
     console.error("HeyReach error:", err);
     return NextResponse.json(
-      { activeSequences: 0, totalSequences: 0, error: "HeyReach unavailable" }
+      { activeSequences: 0, totalSequences: 0, error: "HeyReach unavailable" },
+      { status: 503 }
     );
   }
 }
