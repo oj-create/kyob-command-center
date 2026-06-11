@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build": "prisma generate && next build",
+    "start": "prisma migrate deploy && next start",
     "lint": "eslint",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -37,6 +37,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "caniuse-lite": "^1.0.30001799",
     "eslint": "^9",
     "eslint-config-next": "^15.3.3",
     "jest": "^30.4.2",
