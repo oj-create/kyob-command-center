@@ -13,11 +13,13 @@ export default function QuickLog({ onTaskAdded }: Props) {
     e.preventDefault();
     if (!value.trim()) return;
 
-    await fetch("/api/tasks", {
+    const res = await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: value.trim(), source: "manual" }),
     });
+
+    if (!res.ok) return;
 
     setValue("");
     onTaskAdded();

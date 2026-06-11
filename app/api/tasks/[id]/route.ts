@@ -14,14 +14,21 @@ export async function PATCH(
     priority?: Priority;
   };
 
-  const task = await db.task.update({
-    where: { id },
-    data: {
-      ...(status && { status }),
-      ...(area && { area }),
-      ...(priority !== undefined && { priority }),
-    },
-  });
-
-  return NextResponse.json(task);
+  try {
+    const task = await db.task.update({
+      where: { id },
+      data: {
+        ...(status !== undefined && { status }),
+        ...(area !== undefined && { area }),
+        ...(priority !== undefined && { priority }),
+      },
+    });
+    return NextResponse.json(task);
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === "P2025") {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+    throw err;
+  }
 }
