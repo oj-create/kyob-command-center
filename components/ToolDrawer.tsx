@@ -5,6 +5,7 @@ type Tool = {
   description: string;
   inputs: string;
   claudeSkillPath: string;
+  category: string;
   lastRun: string | null;
 };
 

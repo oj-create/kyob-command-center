@@ -9,7 +9,10 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen">
       <Sidebar>
-        <p className="text-xs text-white/40 uppercase tracking-widest">Today</p>
+        <div>
+          <p className="text-xs text-white/40 uppercase tracking-widest">Quick Tasks</p>
+          <p className="text-[10px] text-white/20 mt-0.5">personal &amp; ad-hoc</p>
+        </div>
         <TodaySection />
         <p className="text-xs text-white/40 uppercase tracking-widest mt-4">Tools</p>
         <ToolsSection />
@@ -26,6 +29,7 @@ export default function Dashboard() {
             day: "numeric",
           })}
         </h1>
+        <p className="text-[10px] text-white/25 uppercase tracking-widest -mt-4">Focus Areas</p>
         <OutboundPanel />
         <ContentPanel />
         <WebsitePanel />
