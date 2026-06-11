@@ -1,4 +1,6 @@
-export default function Sidebar({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from "react";
+
+export default function Sidebar({ children }: { children: ReactNode }) {
   return (
     <aside
       style={{ width: "var(--sidebar-width)" }}
