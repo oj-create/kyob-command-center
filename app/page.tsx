@@ -2,6 +2,8 @@ import Sidebar from "@/components/Sidebar";
 import TodaySection from "@/components/TodaySection";
 import OutboundPanel from "@/components/OutboundPanel";
 import ContentPanel from "@/components/ContentPanel";
+import WebsitePanel from "@/components/WebsitePanel";
+import ToolsSection from "@/components/ToolsSection";
 
 export default function Dashboard() {
   return (
@@ -10,7 +12,7 @@ export default function Dashboard() {
         <p className="text-xs text-white/40 uppercase tracking-widest">Today</p>
         <TodaySection />
         <p className="text-xs text-white/40 uppercase tracking-widest mt-4">Tools</p>
-        {/* ToolsSection goes here in Task 10 */}
+        <ToolsSection />
       </Sidebar>
 
       <main
@@ -26,10 +28,7 @@ export default function Dashboard() {
         </h1>
         <OutboundPanel />
         <ContentPanel />
-        <div className="rounded-xl bg-[#1e1e35] border border-white/10 p-5">
-          <p className="text-xs text-purple-400 uppercase tracking-widest mb-2">Website</p>
-          <p className="text-white/40 text-sm">Loading...</p>
-        </div>
+        <WebsitePanel />
       </main>
     </div>
   );

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "LinkedIn Post",
+    "description": "Creates LinkedIn posts in Evan's voice. Used for Monday content creation sessions.",
+    "inputs": "Topic, angle, any reference content or examples",
+    "claudeSkillPath": "Claude Plugins/marketing/1.1.0/skills/social-content"
+  },
+  {
+    "name": "HeyReach Outbound",
+    "description": "Manages outbound sequences and follow-up cadences via HeyReach.",
+    "inputs": "Lead list, sequence type, personalization context",
+    "claudeSkillPath": "Claude Skills/heyreach-sales-flow"
+  },
+  {
+    "name": "ICP Reference",
+    "description": "Quely Ideal Customer Profile — who the product is for, pain points, jobs to be done.",
+    "inputs": "Read-only reference doc",
+    "claudeSkillPath": "The Quely ICP Description_.pdf"
+  },
+  {
+    "name": "GTM Strategy",
+    "description": "Go-to-market strategy, ECP breakdown, and positioning reference.",
+    "inputs": "Read-only reference doc",
+    "claudeSkillPath": "Quely GTM/"
+  },
+  {
+    "name": "Cold Email",
+    "description": "Writes cold outbound emails for prospect sequences.",
+    "inputs": "Prospect context, sequence stage, goal",
+    "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/cold-email"
+  }
+]
