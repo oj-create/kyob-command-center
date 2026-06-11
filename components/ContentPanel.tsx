@@ -16,6 +16,69 @@ const STATUS_BADGE: Record<string, string> = {
   published: "bg-green-500/20 text-green-300",
 };
 
+const REPURPOSE_ITEMS = [
+  { key: "linkedin", label: "Engage on LinkedIn (comments + replies)" },
+  { key: "atlassian", label: "Post to Atlassian Community" },
+  { key: "youtube", label: "Post to YouTube Community" },
+];
+
+function RepurposeChecklist() {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const storageKey = `repurpose-${todayKey}`;
+
+  const [checked, setChecked] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  function toggle(key: string) {
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify([...next]));
+      } catch {}
+      return next;
+    });
+  }
+
+  const allDone = checked.size === REPURPOSE_ITEMS.length;
+
+  return (
+    <div className={`rounded-lg border p-3 mb-4 ${allDone ? "border-green-500/20 bg-green-500/5" : "border-purple-500/20 bg-purple-500/5"}`}>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] text-purple-400 uppercase tracking-widest">
+          Repurpose by 4pm
+        </p>
+        {allDone && (
+          <span className="text-[10px] text-green-400">Done today</span>
+        )}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        {REPURPOSE_ITEMS.map((item) => (
+          <label key={item.key} className="flex items-center gap-2 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={checked.has(item.key)}
+              onChange={() => toggle(item.key)}
+              className="accent-purple-500 flex-shrink-0"
+            />
+            <span className={`text-xs transition-colors ${checked.has(item.key) ? "line-through text-white/25" : "text-white/70 group-hover:text-white/90"}`}>
+              {item.label}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ContentPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filter, setFilter] = useState<string>("all");
@@ -57,6 +120,7 @@ export default function ContentPanel() {
           ))}
         </div>
       </div>
+      <RepurposeChecklist />
       {fetchError ? (
         <p className="text-white/30 text-sm">Posts unavailable</p>
       ) : filtered.length === 0 ? (
