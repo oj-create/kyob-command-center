@@ -1,5 +1,7 @@
 import Sidebar from "@/components/Sidebar";
 import TodaySection from "@/components/TodaySection";
+import OutboundPanel from "@/components/OutboundPanel";
+import ContentPanel from "@/components/ContentPanel";
 
 export default function Dashboard() {
   return (
@@ -22,14 +24,8 @@ export default function Dashboard() {
             day: "numeric",
           })}
         </h1>
-        <div className="rounded-xl bg-[#1e1e35] border border-white/10 p-5">
-          <p className="text-xs text-purple-400 uppercase tracking-widest mb-2">Outbound</p>
-          <p className="text-white/40 text-sm">Loading...</p>
-        </div>
-        <div className="rounded-xl bg-[#1e1e35] border border-white/10 p-5">
-          <p className="text-xs text-purple-400 uppercase tracking-widest mb-2">Content</p>
-          <p className="text-white/40 text-sm">Loading...</p>
-        </div>
+        <OutboundPanel />
+        <ContentPanel />
         <div className="rounded-xl bg-[#1e1e35] border border-white/10 p-5">
           <p className="text-xs text-purple-400 uppercase tracking-widest mb-2">Website</p>
           <p className="text-white/40 text-sm">Loading...</p>
