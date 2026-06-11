@@ -40,6 +40,19 @@ describe("extractFathomTasks", () => {
     expect(tasks).toHaveLength(1);
     expect(tasks[0].title).toBe("OJ to send the brief");
   });
+
+  it("matches on assignee field even when name is absent from text", () => {
+    const payload = {
+      call_id: "abc",
+      action_items: [
+        { text: "Send the proposal", assignee: "OJ" },
+        { text: "Review docs", assignee: "team" },
+      ],
+    };
+    const tasks = extractFathomTasks(payload, ["OJ"]);
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].title).toBe("Send the proposal");
+  });
 });
 
 describe("extractSlackTask", () => {

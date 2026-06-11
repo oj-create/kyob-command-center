@@ -3,8 +3,13 @@ import { db } from "@/lib/db";
 import { extractSlackTask } from "@/lib/webhooks";
 
 export async function POST(request: NextRequest) {
-  const payload = await request.json();
-  const extracted = extractSlackTask(payload);
+  let payload: unknown;
+  try {
+    payload = await request.json();
+  } catch {
+    return NextResponse.json({ error: "invalid json" }, { status: 400 });
+  }
+  const extracted = extractSlackTask(payload as { text?: string; message?: string });
 
   if (!extracted) {
     return NextResponse.json({ error: "no text" }, { status: 400 });
