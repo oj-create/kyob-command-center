@@ -1,11 +1,12 @@
 import Sidebar from "@/components/Sidebar";
+import TodaySection from "@/components/TodaySection";
 
 export default function Dashboard() {
   return (
     <div className="flex min-h-screen">
       <Sidebar>
         <p className="text-xs text-white/40 uppercase tracking-widest">Today</p>
-        {/* TodaySection + QuickLog go here in Task 4 */}
+        <TodaySection />
         <p className="text-xs text-white/40 uppercase tracking-widest mt-4">Tools</p>
         {/* ToolsSection goes here in Task 10 */}
       </Sidebar>
