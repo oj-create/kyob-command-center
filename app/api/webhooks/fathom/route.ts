@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { extractFathomTasks } from "@/lib/webhooks";
 
-const USER_NAMES = ["OJ", "Evan"];
+const USER_NAMES = ["OJ", "Ojelola", "Ojelabi", "oj@quely.io", "Evan", "evan@quely.io", "evan@fishyvisions.com"];
 
 export async function POST(request: NextRequest) {
   let payload: unknown;

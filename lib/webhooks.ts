@@ -1,8 +1,17 @@
-type FathomActionItem = { text: string; assignee?: string } | string;
+type FathomAssignee = { name?: string; email?: string | null; team?: string | null } | string;
 
-type FathomPayload = {
+type FathomActionItem = {
+  description?: string; // Fathom v2
+  text?: string;        // Fathom v1 / plain string fallback
+  assignee?: FathomAssignee;
+  completed?: boolean;
+};
+
+type FathomBody = {
+  recording_id?: number | string;
   call_id?: string;
   meeting_id?: string;
+  title?: string;
   meeting_title?: string;
   action_items?: FathomActionItem[];
 };
@@ -13,25 +22,40 @@ export type ExtractedTask = {
 };
 
 export function extractFathomTasks(
-  payload: FathomPayload,
+  payload: unknown,
   userNames: string[]
 ): ExtractedTask[] {
-  const items = payload.action_items ?? [];
-  const meetingId = payload.call_id ?? payload.meeting_id;
+  // Unwrap N8N envelope: [{body: {...}}] or {body: {...}} or raw FathomBody
+  let body: FathomBody;
+  if (Array.isArray(payload) && payload.length > 0 && (payload[0] as Record<string, unknown>).body) {
+    body = (payload[0] as { body: FathomBody }).body;
+  } else if (payload !== null && typeof payload === "object" && "body" in (payload as object)) {
+    body = (payload as { body: FathomBody }).body;
+  } else {
+    body = payload as FathomBody;
+  }
+
+  const items = body?.action_items ?? [];
+  const meetingId = String(body?.recording_id ?? body?.call_id ?? body?.meeting_id ?? "") || undefined;
   const lowerNames = userNames.map((n) => n.toLowerCase());
 
   return items
     .filter((item) => {
-      const text = typeof item === "string" ? item : item.text;
-      const assignee = typeof item === "string" ? "" : (item.assignee ?? "");
+      const taskText = (item.description ?? item.text ?? "").toLowerCase();
+      const assigneeName = typeof item.assignee === "string"
+        ? item.assignee
+        : (item.assignee?.name ?? "");
+      const assigneeEmail = typeof item.assignee === "string"
+        ? ""
+        : (item.assignee?.email ?? "");
+      const assigneeLower = `${assigneeName} ${assigneeEmail}`.toLowerCase();
+
       return lowerNames.some(
-        (name) =>
-          text.toLowerCase().includes(name) ||
-          assignee.toLowerCase().includes(name)
+        (name) => taskText.includes(name) || assigneeLower.includes(name)
       );
     })
     .map((item) => ({
-      title: typeof item === "string" ? item : item.text,
+      title: item.description ?? item.text ?? "",
       meetingId,
     }));
 }
