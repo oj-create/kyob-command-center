@@ -76,5 +76,5 @@ type SlackPayload = { text?: string; message?: string };
 export function extractSlackTask(payload: SlackPayload): ExtractedTask | null {
   const text = (payload.text ?? payload.message ?? "").trim();
   if (!text) return null;
-  return { title: text, meetingId: undefined };
+  return { title: text, meetingId: undefined, notes: undefined };
 }
