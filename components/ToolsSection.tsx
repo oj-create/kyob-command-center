@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import ToolDrawer from "./ToolDrawer";
 
+type ToolFile = { name: string; path: string };
+
 type Tool = {
   name: string;
   description: string;
@@ -10,6 +12,8 @@ type Tool = {
   claudeSkillPath: string;
   category: string;
   lastRun: string | null;
+  files?: ToolFile[];
+  connectors?: string[];
 };
 
 export default function ToolsSection() {

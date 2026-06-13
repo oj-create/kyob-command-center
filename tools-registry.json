@@ -4,195 +4,321 @@
     "description": "Generates a complete batch of 5 LinkedIn posts (2 TOFU, 2 MOFU, 1 BOFU) following Evan's voice and Quely brand guidelines.",
     "inputs": "Topic direction, any reference content, week/date for scheduling",
     "claudeSkillPath": "Claude Skills/linkedin-content-engine",
-    "category": "Content & LinkedIn"
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/linkedin-content-engine/SKILL.md" },
+      { "name": "voice-refinements.md", "path": "Claude Skills/linkedin-content-engine/linkedin-content-engine-voice-refinements.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Evan Thought Leadership",
     "description": "Writes LinkedIn posts that sound like Evan — opinionated, specific, earned — with voice rules and templates.",
     "inputs": "Topic, angle, any raw notes or examples",
     "claudeSkillPath": "Claude Skills/evan-thought-leadership",
-    "category": "Content & LinkedIn"
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/evan-thought-leadership/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "LinkedIn Comment",
     "description": "Generates knowledgeable LinkedIn comments that sound like a practitioner, not marketing.",
     "inputs": "The post text you want to comment on",
     "claudeSkillPath": "Claude Skills/linkedin-comment",
-    "category": "Content & LinkedIn"
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/linkedin-comment/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Video Content Repurposing",
     "description": "Turns raw video transcripts into complete YouTube upload packages plus LinkedIn captions grounded in Quely product reality.",
     "inputs": "Raw video transcript or summary",
     "claudeSkillPath": "Claude Skills/video-content-repurposing",
-    "category": "Content & LinkedIn"
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/video-content-repurposing/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Brand Voice",
     "description": "Applies and enforces Quely's communication style across any content.",
     "inputs": "Draft content to review or enforce brand voice on",
     "claudeSkillPath": "Claude Plugins/brand-voice/1.0.0/skills/brand-voice-enforcement",
-    "category": "Content & LinkedIn"
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/brand-voice/1.0.0/skills/brand-voice-enforcement/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Social Content",
     "description": "Creates social media content following brand guidelines.",
     "inputs": "Topic, platform, goal",
-    "claudeSkillPath": "Claude Plugins/marketing/1.1.0/skills/social-content",
-    "category": "Content & LinkedIn"
+    "claudeSkillPath": "Claude Plugins/marketing/1.1.0/skills/content-creation",
+    "category": "Content & LinkedIn",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/marketing/1.1.0/skills/content-creation/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/marketing/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Slack", "Canva", "Figma", "HubSpot", "Amplitude", "Notion", "Ahrefs", "Similarweb", "Klaviyo"]
   },
   {
     "name": "HeyReach Outbound",
     "description": "Analyzes LinkedIn conversation screenshots, generates optimal responses, and flags campaign patterns for Quely outreach.",
     "inputs": "LinkedIn conversation screenshot or message text",
     "claudeSkillPath": "Claude Skills/heyreach-sales-flow",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/heyreach-sales-flow/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Account Research",
     "description": "Researches a company or person and returns actionable sales intel.",
     "inputs": "Company name or LinkedIn URL",
     "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/account-research",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/sales/1.1.0/skills/account-research/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/sales/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "HubSpot", "Close", "Clay", "ZoomInfo", "Gmail", "Notion", "Fireflies", "Jira", "Outreach"]
   },
   {
     "name": "Call Prep",
     "description": "Prepares for sales calls with account context, attendee research, and suggested agenda.",
     "inputs": "Company name, attendee names, meeting goal",
     "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/call-prep",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/sales/1.1.0/skills/call-prep/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/sales/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "HubSpot", "Close", "Clay", "ZoomInfo", "Gmail", "Notion", "Fireflies", "Jira", "Outreach"]
   },
   {
     "name": "Draft Outreach",
     "description": "Drafts outreach messages and campaigns for cold and warm prospects.",
     "inputs": "Prospect context, sequence stage, goal",
     "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/draft-outreach",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/sales/1.1.0/skills/draft-outreach/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/sales/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "HubSpot", "Close", "Clay", "ZoomInfo", "Gmail", "Notion", "Fireflies", "Jira", "Outreach"]
   },
   {
     "name": "Partnership Sourcing",
     "description": "Runs weekly Pool #1 sourcing block — scrapes Evan's LinkedIn engagers and presents candidates for qualification.",
     "inputs": "LinkedIn engager list or Evan's recent post URLs",
     "claudeSkillPath": "Quely Partnership Engine/skills/pool1-source",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely Partnership Engine/skills/pool1-source/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Daily Sales Briefing",
     "description": "Generates a daily sales briefing with priorities, follow-ups, and pipeline status.",
     "inputs": "Current pipeline state, recent activity",
     "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/daily-briefing",
-    "category": "Outbound & Sales"
+    "category": "Outbound & Sales",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/sales/1.1.0/skills/daily-briefing/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/sales/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "HubSpot", "Close", "Clay", "ZoomInfo", "Gmail", "Notion", "Fireflies", "Jira", "Outreach"]
   },
   {
     "name": "LinkedIn Research",
     "description": "Researches LinkedIn profiles, companies, posts, and employees using Apify actors.",
     "inputs": "LinkedIn URL or company/person name",
     "claudeSkillPath": "Claude Skills/linkedin-research",
-    "category": "Research"
+    "category": "Research",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/linkedin-research/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Reddit Research",
     "description": "Reads Reddit posts and extracts comments using Playwright browser automation.",
     "inputs": "Reddit URL or search query",
     "claudeSkillPath": "Claude Skills/reddit-research",
-    "category": "Research"
+    "category": "Research",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Skills/reddit-research/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Competitive Intelligence",
     "description": "Researches competitors from a sales perspective — positioning, pricing, weaknesses.",
     "inputs": "Competitor name or URL",
     "claudeSkillPath": "Claude Plugins/sales/1.1.0/skills/competitive-intelligence",
-    "category": "Research"
+    "category": "Research",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/sales/1.1.0/skills/competitive-intelligence/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/sales/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "HubSpot", "Close", "Clay", "ZoomInfo", "Gmail", "Notion", "Fireflies", "Jira", "Outreach"]
   },
   {
     "name": "Competitive Analysis",
     "description": "Builds feature comparison matrices, positioning analysis, and strategic implications.",
     "inputs": "Competitors to analyze, focus area",
     "claudeSkillPath": "Claude Plugins/product-management/1.1.0/skills/competitive-analysis",
-    "category": "Research"
+    "category": "Research",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/product-management/1.1.0/skills/competitive-analysis/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/product-management/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "Figma", "Gmail", "Notion", "Fireflies", "Amplitude", "Linear", "Jira", "Intercom"]
   },
   {
     "name": "Crafting Positioning",
     "description": "Positions Quely in the market using April Dunford framework — UVP, messaging, differentiation.",
     "inputs": "Current positioning draft or positioning problem to solve",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/crafting-positioning",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/crafting-positioning/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Building Communication Engine",
     "description": "Chooses GTM channels, plans launch newsletter, sets budget, collects social proof.",
     "inputs": "Current GTM stage, target channels",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/building-communication-engine",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/building-communication-engine/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Running Marketing",
     "description": "Builds ongoing marketing engine — content strategy, social publishing, email sequences, paid ads.",
     "inputs": "Current marketing state, focus area",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/running-marketing",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/running-marketing/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Executing Sales",
     "description": "Builds sales engine — deck, case studies, outbound campaigns, partnership programs, ABM strategy.",
     "inputs": "Sales stage, target accounts or segments",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/executing-sales",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/executing-sales/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Preparing Launch Assets",
     "description": "Builds launch assets — website, pitch deck, press release, product demo, media kit.",
     "inputs": "Launch type, existing assets, target audience",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/preparing-launch-assets",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/preparing-launch-assets/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "GTM Foundations",
     "description": "Builds strategic GTM foundation — OPE canvas, SWOT, value proposition, 90-day plan.",
     "inputs": "Product/stage context, current GTM challenges",
     "claudeSkillPath": "Quely GTM/Quely's GTM/.claude/skills/gtm-foundations",
-    "category": "GTM Strategy"
+    "category": "GTM Strategy",
+    "files": [
+      { "name": "SKILL.md", "path": "Quely GTM/Quely's GTM/.claude/skills/gtm-foundations/SKILL.md" }
+    ],
+    "connectors": []
   },
   {
     "name": "Feature Spec",
     "description": "Writes structured PRDs with problem statements, user stories, requirements, and success metrics.",
     "inputs": "Feature idea, user problem, success criteria",
     "claudeSkillPath": "Claude Plugins/product-management/1.1.0/skills/feature-spec",
-    "category": "Product"
+    "category": "Product",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/product-management/1.1.0/skills/feature-spec/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/product-management/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "Figma", "Gmail", "Notion", "Fireflies", "Amplitude", "Linear", "Jira", "Intercom"]
   },
   {
     "name": "Roadmap Management",
     "description": "Plans and prioritizes roadmaps using RICE, MoSCoW, ICE frameworks.",
     "inputs": "Feature backlog, current priorities, constraints",
     "claudeSkillPath": "Claude Plugins/product-management/1.1.0/skills/roadmap-management",
-    "category": "Product"
+    "category": "Product",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/product-management/1.1.0/skills/roadmap-management/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/product-management/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "Figma", "Gmail", "Notion", "Fireflies", "Amplitude", "Linear", "Jira", "Intercom"]
   },
   {
     "name": "Stakeholder Comms",
     "description": "Drafts stakeholder updates tailored to executives, engineering, partners, and customers.",
     "inputs": "Update topic, audience, key points to communicate",
     "claudeSkillPath": "Claude Plugins/product-management/1.1.0/skills/stakeholder-comms",
-    "category": "Product"
+    "category": "Product",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/product-management/1.1.0/skills/stakeholder-comms/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/product-management/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "Figma", "Gmail", "Notion", "Fireflies", "Amplitude", "Linear", "Jira", "Intercom"]
   },
   {
     "name": "User Research Synthesis",
     "description": "Synthesizes qualitative and quantitative research into actionable insights.",
     "inputs": "Raw research notes, interview transcripts, or survey data",
     "claudeSkillPath": "Claude Plugins/product-management/1.1.0/skills/user-research-synthesis",
-    "category": "Product"
+    "category": "Product",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/product-management/1.1.0/skills/user-research-synthesis/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/product-management/1.1.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Google Calendar", "Slack", "Similarweb", "Figma", "Gmail", "Notion", "Fireflies", "Amplitude", "Linear", "Jira", "Intercom"]
   },
   {
     "name": "SQL Queries",
     "description": "Writes correct, performant SQL across all major data warehouse dialects.",
     "inputs": "Schema description, question to answer with data",
     "claudeSkillPath": "Claude Plugins/data/1.0.0/skills/sql-queries",
-    "category": "Data"
+    "category": "Data",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/data/1.0.0/skills/sql-queries/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/data/1.0.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Snowflake", "BigQuery", "Databricks", "Hex", "Amplitude", "Jira"]
   },
   {
     "name": "Data Visualization",
     "description": "Creates visualizations and charts from data to communicate insights.",
     "inputs": "Data source, question to visualize, preferred chart type",
     "claudeSkillPath": "Claude Plugins/data/1.0.0/skills/data-visualization",
-    "category": "Data"
+    "category": "Data",
+    "files": [
+      { "name": "SKILL.md", "path": "Claude Plugins/data/1.0.0/skills/data-visualization/SKILL.md" },
+      { "name": "CONNECTORS.md", "path": "Claude Plugins/data/1.0.0/CONNECTORS.md" }
+    ],
+    "connectors": ["Snowflake", "BigQuery", "Databricks", "Hex", "Amplitude", "Jira"]
   }
 ]
