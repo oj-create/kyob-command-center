@@ -10,6 +10,9 @@ type Task = {
   source: string;
   area: string;
   status: string;
+  createdAt: string;
+  meetingId?: string | null;
+  notes?: string | null;
 };
 
 export default function TodaySection() {

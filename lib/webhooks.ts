@@ -19,6 +19,7 @@ type FathomBody = {
 export type ExtractedTask = {
   title: string;
   meetingId: string | undefined;
+  notes: string | undefined;
 };
 
 export function extractFathomTasks(
@@ -54,10 +55,20 @@ export function extractFathomTasks(
         (name) => taskText.includes(name) || assigneeLower.includes(name)
       );
     })
-    .map((item) => ({
-      title: item.description ?? item.text ?? "",
-      meetingId,
-    }));
+    .map((item) => {
+      const meetingTitle = body?.title ?? body?.meeting_title;
+      const timestamp = (item as Record<string, unknown>).recording_timestamp as string | undefined;
+      const playbackUrl = (item as Record<string, unknown>).recording_playback_url as string | undefined;
+      const parts: string[] = [];
+      if (meetingTitle) parts.push(`Meeting: ${meetingTitle}`);
+      if (timestamp) parts.push(`Timestamp: ${timestamp}`);
+      if (playbackUrl) parts.push(`Clip: ${playbackUrl}`);
+      return {
+        title: item.description ?? item.text ?? "",
+        meetingId,
+        notes: parts.length > 0 ? parts.join(" · ") : undefined,
+      };
+    });
 }
 
 type SlackPayload = { text?: string; message?: string };

@@ -16,10 +16,7 @@ export async function POST(request: NextRequest) {
   console.log("[fathom webhook] raw payload:", JSON.stringify(payload, null, 2));
 
   try {
-    const extracted = extractFathomTasks(
-      payload as Parameters<typeof extractFathomTasks>[0],
-      USER_NAMES
-    );
+    const extracted = extractFathomTasks(payload, USER_NAMES);
 
     console.log("[fathom webhook] extracted tasks:", extracted.length, extracted);
 
@@ -27,16 +24,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ created: 0 });
     }
 
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-
     await db.task.createMany({
-      data: extracted.map(({ title, meetingId }) => ({
+      data: extracted.map(({ title, meetingId, notes }) => ({
         title,
         source: "fathom" as const,
         area: "general" as const,
-        dueDate: today,
         meetingId,
+        notes,
       })),
     });
 

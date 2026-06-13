@@ -45,6 +45,7 @@ model Task {
   priority  Priority?
   dueDate   DateTime?
   meetingId String?
+  notes     String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
