@@ -46,50 +46,12 @@ export default function OrientBar() {
     } catch {}
   }, [todayKey]);
 
-  const stats = [
-    { num: taskCount ?? "—", label: "Tasks open" },
-    { num: scheduledCount ?? "—", label: "Posts queued" },
-    { num: `${repurposeDone}/3`, label: "Repurpose" },
-  ];
-
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        justifyContent: "space-between",
-        gap: "24px",
-        paddingBottom: "20px",
-        borderBottom: "1px solid var(--line)",
-        marginBottom: "4px",
-      }}
-    >
+    <div className="orient">
       <div>
-        <div
-          style={{
-            fontSize: "10px",
-            color: "var(--tx-3)",
-            fontWeight: 500,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            marginBottom: "4px",
-          }}
-        >
-          {dayLabel} · Week {weekNum}
-        </div>
-        <div
-          style={{
-            fontSize: "22px",
-            fontWeight: 600,
-            color: "var(--tx)",
-            lineHeight: 1.15,
-            marginBottom: "6px",
-            fontFamily: '"Geist", ui-sans-serif',
-          }}
-        >
-          {dateLabel}
-        </div>
-        <div style={{ fontSize: "12px", color: "var(--tx-2)", lineHeight: 1.5 }}>
+        <div className="orient-day">{dayLabel} · Week {weekNum}</div>
+        <div className="orient-date">{dateLabel}</div>
+        <div className="orient-status">
           Day in progress
           {taskCount !== null
             ? ` — ${taskCount} task${taskCount !== 1 ? "s" : ""} open`
@@ -97,34 +59,21 @@ export default function OrientBar() {
           . HeyReach not checked yet.
         </div>
       </div>
-
-      <div style={{ display: "flex", gap: "20px", flexShrink: 0, alignItems: "flex-start" }}>
-        {stats.map(({ num, label }, i) => (
-          <div key={label} style={{ textAlign: "center" }}>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                color: i === 0 ? "var(--accent-bright)" : "var(--tx)",
-                lineHeight: 1,
-                fontFamily: '"Geist Mono", ui-monospace',
-              }}
-            >
-              {num}
-            </div>
-            <div
-              style={{
-                fontSize: "10px",
-                color: "var(--tx-3)",
-                marginTop: "5px",
-                letterSpacing: "0.04em",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {label}
-            </div>
+      <div className="momentum">
+        <div className="mo accent">
+          <div className="mo-num">{taskCount ?? "—"}</div>
+          <div className="mo-lbl">Tasks open</div>
+        </div>
+        <div className="mo">
+          <div className="mo-num">{scheduledCount ?? "—"}</div>
+          <div className="mo-lbl">Posts queued</div>
+        </div>
+        <div className="mo">
+          <div className="mo-num">
+            {repurposeDone}<small> / 3</small>
           </div>
-        ))}
+          <div className="mo-lbl">Repurpose</div>
+        </div>
       </div>
     </div>
   );

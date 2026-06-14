@@ -1,39 +1,35 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { LayoutGrid } from "lucide-react";
 import ContentPanel from "./ContentPanel";
 import OutboundPanel from "./OutboundPanel";
 import WebsitePanel from "./WebsitePanel";
 
 const MIN_SPLIT = 0.32;
-const MAX_SPLIT = 0.72;
-const DEFAULT_SPLIT = 0.55;
-const STORAGE_KEY = "board-split";
+const MAX_SPLIT = 0.75;
+const DEFAULT_SPLIT = 0.608; /* matches 1.55fr / (1.55 + 1) */
 
 function clamp(v: number, a: number, b: number) {
   return Math.max(a, Math.min(b, v));
 }
 
-function getSavedSplit(): number {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    if (s) return clamp(parseFloat(s), MIN_SPLIT, MAX_SPLIT);
-  } catch {}
-  return DEFAULT_SPLIT;
-}
-
 export default function BoardSection() {
   const [split, setSplit] = useState<number>(() => {
     if (typeof window === "undefined") return DEFAULT_SPLIT;
-    return getSavedSplit();
+    try {
+      const s = localStorage.getItem("board-split");
+      if (s) return clamp(parseFloat(s), MIN_SPLIT, MAX_SPLIT);
+    } catch {}
+    return DEFAULT_SPLIT;
   });
   const boardRef = useRef<HTMLDivElement>(null);
 
-  function handleSplitterDown(e: React.PointerEvent) {
+  function handleResizerDown(e: React.PointerEvent) {
     e.preventDefault();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
-
     let raf: number | null = null;
 
     function onMove(ev: PointerEvent) {
@@ -41,8 +37,7 @@ export default function BoardSection() {
       raf = requestAnimationFrame(() => {
         const rect = boardRef.current?.getBoundingClientRect();
         if (!rect) return;
-        const newSplit = clamp((ev.clientX - rect.left) / rect.width, MIN_SPLIT, MAX_SPLIT);
-        setSplit(newSplit);
+        setSplit(clamp((ev.clientX - rect.left) / rect.width, MIN_SPLIT, MAX_SPLIT));
       });
     }
 
@@ -53,7 +48,7 @@ export default function BoardSection() {
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
       setSplit((s) => {
-        try { localStorage.setItem(STORAGE_KEY, String(s)); } catch {}
+        try { localStorage.setItem("board-split", String(s)); } catch {}
         return s;
       });
     }
@@ -64,66 +59,25 @@ export default function BoardSection() {
 
   return (
     <div>
-      {/* Board section header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          marginBottom: "14px",
-        }}
-      >
-        <span style={{ fontSize: "13px", color: "var(--tx-3)" }}>⊞</span>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--tx)" }}>
-          Today&apos;s board
-        </span>
-        <span style={{ fontSize: "11px", color: "var(--tx-3)", marginLeft: "2px" }}>
-          Outbound · Content · Website
-        </span>
+      <div className="sec-head">
+        <span className="sec-ico"><LayoutGrid /></span>
+        <span className="sec-title">Today&apos;s board</span>
+        <span className="sec-sub">Outbound · Content · Website</span>
       </div>
 
-      {/* 2-column grid */}
       <div
         ref={boardRef}
-        style={{
-          display: "grid",
-          gridTemplateColumns: `${split}fr 12px ${1 - split}fr`,
-          gap: "0",
-          alignItems: "start",
-        }}
+        className="cgrid"
+        style={{ gridTemplateColumns: `${split}fr 20px ${1 - split}fr` }}
       >
-        {/* Left: ContentPanel */}
         <ContentPanel />
-
-        {/* Splitter */}
         <div
-          onPointerDown={handleSplitterDown}
-          style={{
-            height: "100%",
-            minHeight: "100px",
-            cursor: "col-resize",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            paddingTop: "40px",
-          }}
-          title="Drag to resize columns"
-        >
-          <div
-            style={{
-              width: "2px",
-              height: "48px",
-              borderRadius: "2px",
-              background: "var(--line-2)",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--accent-line)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--line-2)"; }}
-          />
-        </div>
-
-        {/* Right: Outbound + Website stacked */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          className="board-resizer"
+          onPointerDown={handleResizerDown}
+          role="separator"
+          aria-orientation="vertical"
+        />
+        <div className="col">
           <OutboundPanel />
           <WebsitePanel />
         </div>

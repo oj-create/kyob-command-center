@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { Wrench, Search, ChevronRight, PenLine, Send, Globe, BarChart3, Target, Box } from "lucide-react";
 import ToolDrawer from "./ToolDrawer";
 
 type ToolFile = { name: string; path: string };
-
 type Tool = {
   name: string;
   description: string;
@@ -16,6 +16,15 @@ type Tool = {
   connectors?: string[];
 };
 
+const CAT_ICON: Record<string, React.ReactNode> = {
+  "Content & LinkedIn": <PenLine />,
+  "Outbound & Sales": <Send />,
+  "Research": <Search />,
+  "GTM Strategy": <Target />,
+  "Product": <Box />,
+  "Data": <BarChart3 />,
+};
+
 export default function ToolsSection() {
   const [tools, setTools] = useState<Tool[]>([]);
   const [selected, setSelected] = useState<Tool | null>(null);
@@ -24,14 +33,10 @@ export default function ToolsSection() {
   const refreshTools = () => {
     fetch("/api/tools")
       .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setTools(data);
-      });
+      .then((data) => { if (Array.isArray(data)) setTools(data); });
   };
 
-  useEffect(() => {
-    refreshTools();
-  }, []);
+  useEffect(() => { refreshTools(); }, []);
 
   async function handleLaunch(tool: Tool) {
     await fetch("/api/tools/runs", {
@@ -65,135 +70,50 @@ export default function ToolsSection() {
 
   return (
     <>
-      {/* Zone header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "12px 14px 8px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <span style={{ fontSize: "11px", color: "var(--tx-3)" }}>⚙</span>
-          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--tx)" }}>
+      <div className="tools-zone">
+        <div className="tool-zone-head">
+          <div className="zone-title">
+            <Wrench />
             Tools
-          </span>
+          </div>
+          <div className="zone-count">{tools.length} skills</div>
         </div>
-        <span
-          style={{
-            fontSize: "10px",
-            color: "var(--tx-3)",
-            fontFamily: '"Geist Mono", ui-monospace',
-          }}
-        >
-          {tools.length} skills
-        </span>
-      </div>
 
-      {/* Search */}
-      <div style={{ padding: "0 10px 8px" }}>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={`Filter ${tools.length} tools…`}
-          style={{
-            width: "100%",
-            background: "var(--panel-2)",
-            border: "1px solid var(--line)",
-            borderRadius: "6px",
-            padding: "6px 10px",
-            fontSize: "11px",
-            color: "var(--tx-2)",
-            outline: "none",
-            boxSizing: "border-box",
-            fontFamily: "inherit",
-            transition: "border-color 0.15s",
-          }}
-          onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)"; }}
-          onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
-        />
-      </div>
+        <div className="tool-search">
+          <Search />
+          <input
+            placeholder={`Filter ${tools.length} tools…`}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-      {/* Tool list */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 4px 12px" }}>
-        {Object.entries(grouped).map(([category, categoryTools]) => (
-          <div key={category} style={{ marginBottom: "4px" }}>
-            <div
-              style={{
-                padding: "4px 10px 2px",
-                fontSize: "9px",
-                color: "var(--tx-3)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <span>{category}</span>
-              <span style={{ fontFamily: '"Geist Mono", ui-monospace' }}>
-                {categoryTools.length}
-              </span>
-            </div>
-            {categoryTools.map((tool) => (
-              <button
-                key={tool.name}
-                onClick={() => setSelected(tool)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "6px 10px",
-                  borderRadius: "6px",
-                  background: selected?.name === tool.name ? "var(--accent-tint)" : "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "8px",
-                  transition: "background 0.1s",
-                }}
-                onMouseEnter={(e) => {
-                  if (selected?.name !== tool.name)
-                    (e.currentTarget as HTMLElement).style.background = "var(--panel-2)";
-                }}
-                onMouseLeave={(e) => {
-                  if (selected?.name !== tool.name)
-                    (e.currentTarget as HTMLElement).style.background = "transparent";
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: selected?.name === tool.name ? "var(--accent-bright)" : "var(--tx-2)",
-                    lineHeight: 1.3,
-                    transition: "color 0.1s",
-                  }}
+        <div className="tool-scroll">
+          {Object.entries(grouped).map(([category, categoryTools]) => (
+            <div key={category} className="tool-cat">
+              <div className="tool-cat-head">
+                <span className="tool-cat-name">{category}</span>
+                <span className="tool-cat-count">{categoryTools.length}</span>
+              </div>
+              {categoryTools.map((tool) => (
+                <button
+                  key={tool.name}
+                  className={`tool-btn${selected?.name === tool.name ? " is-open" : ""}`}
+                  onClick={() => setSelected(tool)}
                 >
+                  {CAT_ICON[category] ?? <Globe />}
                   {tool.name}
-                </span>
-                <span
-                  style={{
-                    fontSize: "10px",
-                    color: "var(--tx-3)",
-                    opacity: 0,
-                    transition: "opacity 0.1s",
-                    flexShrink: 0,
-                  }}
-                  className="chev"
-                >
-                  ›
-                </span>
-              </button>
-            ))}
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div style={{ padding: "16px 10px", textAlign: "center" }}>
-            <div style={{ fontSize: "12px", color: "var(--tx-3)" }}>No tools match</div>
-          </div>
-        )}
+                  <ChevronRight className="chev" />
+                </button>
+              ))}
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div style={{ padding: "20px 8px", textAlign: "center", color: "var(--tx-3)", fontSize: 12 }}>
+              No tools match &ldquo;{search}&rdquo;
+            </div>
+          )}
+        </div>
       </div>
 
       <ToolDrawer tool={selected} onClose={() => setSelected(null)} onLaunch={handleLaunch} />

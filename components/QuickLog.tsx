@@ -1,27 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { Plus, Sparkles, Check } from "lucide-react";
 
-type Props = {
-  onTaskAdded: () => void;
-};
-
+type Props = { onTaskAdded: () => void };
 type ExtractState = "idle" | "extracting" | "preview";
 
 export default function QuickLog({ onTaskAdded }: Props) {
   const [value, setValue] = useState("");
+  const [active, setActive] = useState(false);
   const [extractState, setExtractState] = useState<ExtractState>("idle");
   const [extractedTasks, setExtractedTasks] = useState<string[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit() {
     if (!value.trim()) return;
 
     if (value.trim().length < 60) {
       await saveTask(value.trim());
       setValue("");
+      setActive(false);
       onTaskAdded();
       return;
     }
@@ -39,6 +38,7 @@ export default function QuickLog({ onTaskAdded }: Props) {
       if (tasks.length === 1) {
         await saveTask(tasks[0]);
         setValue("");
+        setActive(false);
         setExtractState("idle");
         onTaskAdded();
       } else {
@@ -49,6 +49,7 @@ export default function QuickLog({ onTaskAdded }: Props) {
     } catch {
       await saveTask(value.trim());
       setValue("");
+      setActive(false);
       setExtractState("idle");
       onTaskAdded();
     }
@@ -67,6 +68,7 @@ export default function QuickLog({ onTaskAdded }: Props) {
     const toSave = extractedTasks.filter((_, i) => selectedTasks.has(i));
     await Promise.all(toSave.map((title) => saveTask(title)));
     setValue("");
+    setActive(false);
     setExtractedTasks([]);
     setSelectedTasks(new Set());
     setExtractState("idle");
@@ -83,152 +85,75 @@ export default function QuickLog({ onTaskAdded }: Props) {
     });
   }
 
-  function cancelPreview() {
-    setExtractedTasks([]);
-    setSelectedTasks(new Set());
-    setExtractState("idle");
-  }
-
-  if (extractState === "preview") {
-    return (
-      <div
-        style={{
-          background: "var(--panel-2)",
-          border: "1px solid var(--accent-line)",
-          borderRadius: "8px",
-          padding: "10px 12px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-          <span style={{ fontSize: "11px", color: "var(--accent-bright)" }}>✦</span>
-          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--tx)" }}>
-            Found {extractedTasks.length} tasks
-          </span>
-          <span style={{ fontSize: "10px", color: "var(--tx-3)", marginLeft: "2px" }}>· confirm</span>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
-          {extractedTasks.map((task, i) => (
-            <div
-              key={i}
-              onClick={() => toggleTask(i)}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "8px",
-                cursor: "pointer",
-                padding: "4px 0",
-              }}
-            >
-              <div
-                style={{
-                  width: "13px",
-                  height: "13px",
-                  borderRadius: "3px",
-                  border: `1px solid ${selectedTasks.has(i) ? "var(--accent)" : "var(--line-2)"}`,
-                  background: selectedTasks.has(i) ? "var(--accent)" : "transparent",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  marginTop: "1px",
-                  transition: "background 0.15s",
-                }}
-              >
-                {selectedTasks.has(i) && (
-                  <span style={{ fontSize: "8px", color: "#fff" }}>✓</span>
-                )}
-              </div>
-              <span style={{ fontSize: "11px", color: "var(--tx-2)", lineHeight: 1.4 }}>{task}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: "6px" }}>
-          <button
-            onClick={confirmTasks}
-            disabled={saving || selectedTasks.size === 0}
-            style={{
-              flex: 1,
-              padding: "6px 10px",
-              borderRadius: "6px",
-              background: "var(--accent)",
-              border: "none",
-              color: "#fff",
-              fontSize: "11px",
-              fontWeight: 500,
-              cursor: saving || selectedTasks.size === 0 ? "not-allowed" : "pointer",
-              opacity: saving || selectedTasks.size === 0 ? 0.4 : 1,
-              transition: "background 0.15s",
-            }}
-          >
-            {saving
-              ? "Saving..."
-              : `Add ${selectedTasks.size} task${selectedTasks.size !== 1 ? "s" : ""}`}
-          </button>
-          <button
-            onClick={cancelPreview}
-            style={{
-              padding: "6px 10px",
-              borderRadius: "6px",
-              background: "transparent",
-              border: "1px solid var(--line-2)",
-              color: "var(--tx-3)",
-              fontSize: "11px",
-              cursor: "pointer",
-            }}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const isExtracting = extractState === "extracting";
 
   return (
-    <form onSubmit={handleSubmit} style={{ position: "relative" }}>
-      <input
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder={
-          extractState === "extracting" ? "Extracting tasks..." : "+ Quick log a task..."
-        }
-        disabled={extractState === "extracting"}
-        style={{
-          width: "100%",
-          background: "var(--panel-2)",
-          border: "1px solid var(--line)",
-          borderRadius: "7px",
-          padding: "7px 60px 7px 10px",
-          fontSize: "11px",
-          color: "var(--tx-2)",
-          outline: "none",
-          boxSizing: "border-box",
-          fontFamily: "inherit",
-          transition: "border-color 0.15s",
-        }}
-        onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)"; }}
-        onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
-      />
-      {value.length > 0 && extractState === "idle" && (
-        <button
-          type="submit"
-          style={{
-            position: "absolute",
-            right: "6px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            padding: "3px 8px",
-            borderRadius: "4px",
-            background: "var(--accent-tint)",
-            border: "1px solid var(--accent-line)",
-            color: "var(--accent-bright)",
-            fontSize: "10px",
-            cursor: "pointer",
-            fontWeight: 500,
-          }}
-        >
-          {value.length >= 60 ? "Extract" : "Add"}
-        </button>
+    <div className="quicklog">
+      <div
+        className={`ql-input${active ? " is-active" : ""}`}
+        onClick={() => setActive(true)}
+      >
+        <Plus />
+        <input
+          className="ql-field"
+          placeholder={isExtracting ? "Extracting tasks…" : "+ Quick log a task…"}
+          value={value}
+          disabled={isExtracting}
+          onChange={(e) => setValue(e.target.value)}
+          onFocus={() => setActive(true)}
+          onBlur={() => { if (!value) setActive(false); }}
+          onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
+        />
+        {active && value.length > 0 && !isExtracting && (
+          <button
+            className="btn btn-sm btn-ghost"
+            style={{ padding: "4px 10px", minHeight: "auto", fontSize: 11 }}
+            onClick={(e) => { e.stopPropagation(); handleSubmit(); }}
+          >
+            {value.length >= 60 ? "Extract" : "Add"}
+          </button>
+        )}
+      </div>
+      {!active && (
+        <div className="ql-hint">short → 1 task · long/rambling → AI splits into many</div>
       )}
-    </form>
+
+      {extractState === "preview" && (
+        <div className="ql-preview">
+          <div className="ql-prev-head">
+            <Sparkles className="ql-spark" />
+            <b>Found {extractedTasks.length} tasks</b>
+            <span className="mono" style={{ color: "var(--tx-3)", fontSize: 10 }}>· confirm</span>
+          </div>
+          {extractedTasks.map((t, i) => (
+            <div
+              key={i}
+              className="ql-prev-item"
+              onClick={() => toggleTask(i)}
+            >
+              <span className={`ql-prev-check${selectedTasks.has(i) ? " on" : ""}`}>
+                {selectedTasks.has(i) && <Check />}
+              </span>
+              <span className="ql-prev-txt">{t}</span>
+            </div>
+          ))}
+          <div className="ql-prev-actions">
+            <button
+              className="btn btn-sm btn-primary"
+              disabled={saving || selectedTasks.size === 0}
+              onClick={confirmTasks}
+            >
+              Add {selectedTasks.size} task{selectedTasks.size !== 1 ? "s" : ""}
+            </button>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => { setExtractedTasks([]); setSelectedTasks(new Set()); setExtractState("idle"); }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

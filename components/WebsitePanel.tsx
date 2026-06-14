@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { Globe, AlertTriangle } from "lucide-react";
 
 type Task = {
   id: string;
@@ -22,80 +23,27 @@ function TaskRow({
   const isDone = task.status === "done";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "8px",
-        padding: "7px 12px",
-        borderLeft: isBlocking ? "2px solid rgba(236,106,82,0.45)" : "2px solid transparent",
-        background: isBlocking ? "rgba(236,106,82,0.04)" : "transparent",
-        opacity: isDone ? 0.45 : 1,
-        transition: "background 0.1s",
-      }}
-      onMouseEnter={(e) => {
-        if (!isBlocking) (e.currentTarget as HTMLElement).style.background = "var(--panel-2)";
-      }}
-      onMouseLeave={(e) => {
-        if (!isBlocking) (e.currentTarget as HTMLElement).style.background = "transparent";
-      }}
-    >
+    <div className={`wt${isBlocking ? " blocking" : ""}${isDone ? " done" : ""}`}>
       <button
-        onClick={() => onToggle(task.id, task.status)}
         style={{
-          width: "13px",
-          height: "13px",
-          borderRadius: "3px",
-          border: `1px solid ${isDone ? "var(--accent)" : "var(--line-2)"}`,
+          flexShrink: 0, width: 16, height: 16, marginTop: 3,
+          borderRadius: 5, border: `1.5px solid ${isDone ? "var(--accent)" : "var(--line-3)"}`,
           background: isDone ? "var(--accent)" : "transparent",
-          flexShrink: 0,
-          cursor: "pointer",
-          marginTop: "2px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          transition: "background 0.15s",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontSize: 9, transition: "0.12s",
         }}
+        onClick={() => onToggle(task.id, task.status)}
         aria-label={isDone ? "Reopen task" : "Complete task"}
       >
-        {isDone && <span style={{ fontSize: "8px", color: "#fff" }}>✓</span>}
+        {isDone && "✓"}
       </button>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: "12px",
-            color: isDone ? "var(--tx-3)" : "var(--tx)",
-            textDecoration: isDone ? "line-through" : "none",
-            lineHeight: 1.4,
-            marginBottom: "3px",
-          }}
-        >
+      <div className="wt-body">
+        <div className="wt-title" style={{ opacity: isDone ? 0.45 : 1, textDecoration: isDone ? "line-through" : "none" }}>
           {task.title}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <span
-            style={{
-              fontSize: "9px",
-              color: "var(--tx-3)",
-              textTransform: "capitalize",
-            }}
-          >
-            {task.status}
-          </span>
-          {isBlocking && (
-            <span
-              style={{
-                fontSize: "9px",
-                padding: "1px 5px",
-                borderRadius: "3px",
-                background: "rgba(236,106,82,0.12)",
-                color: "var(--danger)",
-                fontWeight: 500,
-              }}
-            >
-              Blocking
-            </span>
-          )}
+        <div className="wt-meta">
+          <span className="wt-status">{task.status}</span>
+          {isBlocking && <span className="wt-block">Blocking</span>}
         </div>
       </div>
     </div>
@@ -106,7 +54,7 @@ export default function WebsitePanel() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState("");
   const [isBlocking, setIsBlocking] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [logActive, setLogActive] = useState(false);
   const [extractState, setExtractState] = useState<ExtractState>("idle");
   const [extractedTasks, setExtractedTasks] = useState<string[]>([]);
   const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
@@ -117,10 +65,7 @@ export default function WebsitePanel() {
       const res = await fetch("/api/tasks?area=website&all=true");
       const data = await res.json();
       if (Array.isArray(data)) setTasks(data);
-      else setFetchError(data.error ?? "Failed to load tasks");
-    } catch {
-      setFetchError("Failed to load tasks");
-    }
+    } catch {}
   }, []);
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
@@ -146,6 +91,7 @@ export default function WebsitePanel() {
       await saveTask(newTitle.trim());
       setNewTitle("");
       setIsBlocking(false);
+      setLogActive(false);
       fetchTasks();
       return;
     }
@@ -164,6 +110,7 @@ export default function WebsitePanel() {
         await saveTask(extracted[0]);
         setNewTitle("");
         setIsBlocking(false);
+        setLogActive(false);
         setExtractState("idle");
         fetchTasks();
       } else {
@@ -175,6 +122,7 @@ export default function WebsitePanel() {
       await saveTask(newTitle.trim());
       setNewTitle("");
       setIsBlocking(false);
+      setLogActive(false);
       setExtractState("idle");
       fetchTasks();
     }
@@ -216,218 +164,101 @@ export default function WebsitePanel() {
   const done = tasks.filter((t) => t.status === "done");
 
   return (
-    <div
-      style={{
-        background: "var(--panel)",
-        border: "1px solid var(--line)",
-        borderRadius: "10px",
-        overflow: "hidden",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "14px 16px 12px",
-          borderBottom: "1px solid var(--line)",
-        }}
-      >
-        <span style={{ fontSize: "13px" }}>◎</span>
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--tx)", flex: 1 }}>
-          Website
-        </span>
-        <span style={{ fontSize: "10px", color: "var(--tx-3)" }}>
+    <div className="panel">
+      <div className="panel-head">
+        <span className="sec-ico"><Globe /></span>
+        <span className="panel-title">Website</span>
+        <span className="panel-sub">
           quely.com
           {blocking.length > 0 && (
-            <span style={{ color: "var(--danger)", marginLeft: "6px" }}>
-              · {blocking.length} blocking
+            <span className="panel-alert">
+              <AlertTriangle /> {blocking.length} blocking
             </span>
           )}
         </span>
       </div>
 
-      {/* Task rows */}
-      <div style={{ padding: "6px 0" }}>
-        {fetchError ? (
-          <div style={{ padding: "12px 16px", fontSize: "12px", color: "var(--tx-3)" }}>
-            Tasks unavailable
-          </div>
-        ) : (
-          <>
-            {[...blocking, ...normal].map((task) => (
+      <div className="panel-scroll">
+        {[...blocking, ...normal].map((task) => (
+          <TaskRow key={task.id} task={task} onToggle={toggleDone} />
+        ))}
+        {done.length > 0 && (
+          <details className="wt-done-group">
+            <summary>{done.length} completed</summary>
+            {done.map((task) => (
               <TaskRow key={task.id} task={task} onToggle={toggleDone} />
             ))}
-            {done.length > 0 && (
-              <details style={{ padding: "0 12px" }}>
-                <summary
-                  style={{
-                    fontSize: "10px",
-                    color: "var(--tx-3)",
-                    cursor: "pointer",
-                    padding: "6px 0",
-                    userSelect: "none",
-                  }}
-                >
-                  {done.length} completed
-                </summary>
-                {done.map((task) => (
-                  <TaskRow key={task.id} task={task} onToggle={toggleDone} />
-                ))}
-              </details>
-            )}
-            {blocking.length === 0 && normal.length === 0 && done.length === 0 && (
-              <div style={{ padding: "14px 16px", fontSize: "12px", color: "var(--tx-3)" }}>
-                No website tasks yet
-              </div>
-            )}
-          </>
+          </details>
+        )}
+        {blocking.length === 0 && normal.length === 0 && done.length === 0 && (
+          <div className="panel-empty">No website tasks yet</div>
         )}
       </div>
 
-      {/* Quick log */}
-      <div style={{ padding: "8px 12px 12px", borderTop: "1px solid var(--line)" }}>
-        {extractState === "preview" ? (
-          <div
-            style={{
-              background: "var(--panel-2)",
-              border: "1px solid var(--accent-line)",
-              borderRadius: "8px",
-              padding: "10px 12px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-              <span style={{ fontSize: "11px", color: "var(--accent-bright)" }}>✦</span>
-              <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--tx)" }}>
-                Found {extractedTasks.length} tasks
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
-              {extractedTasks.map((task, i) => (
-                <div
-                  key={i}
-                  onClick={() => toggleExtractedTask(i)}
-                  style={{ display: "flex", alignItems: "flex-start", gap: "8px", cursor: "pointer" }}
-                >
-                  <div
-                    style={{
-                      width: "13px",
-                      height: "13px",
-                      borderRadius: "3px",
-                      border: `1px solid ${selectedTasks.has(i) ? "var(--accent)" : "var(--line-2)"}`,
-                      background: selectedTasks.has(i) ? "var(--accent)" : "transparent",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      marginTop: "1px",
-                    }}
-                  >
-                    {selectedTasks.has(i) && <span style={{ fontSize: "8px", color: "#fff" }}>✓</span>}
-                  </div>
-                  <span style={{ fontSize: "11px", color: "var(--tx-2)", lineHeight: 1.4 }}>{task}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: "6px" }}>
-              <button
-                onClick={confirmExtractedTasks}
-                disabled={saving || selectedTasks.size === 0}
-                style={{
-                  flex: 1,
-                  padding: "6px",
-                  borderRadius: "6px",
-                  background: "var(--accent)",
-                  border: "none",
-                  color: "#fff",
-                  fontSize: "11px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  opacity: saving || selectedTasks.size === 0 ? 0.4 : 1,
-                }}
-              >
-                {saving ? "Saving..." : `Add ${selectedTasks.size} task${selectedTasks.size !== 1 ? "s" : ""}`}
-              </button>
-              <button
-                onClick={() => { setExtractedTasks([]); setSelectedTasks(new Set()); setExtractState("idle"); }}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: "6px",
-                  background: "transparent",
-                  border: "1px solid var(--line-2)",
-                  color: "var(--tx-3)",
-                  fontSize: "11px",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-            </div>
+      {extractState === "preview" ? (
+        <div className="ql-preview" style={{ margin: "0 12px 12px" }}>
+          <div className="ql-prev-head">
+            <b>Found {extractedTasks.length} tasks</b>
           </div>
-        ) : (
-          <form onSubmit={addTask} style={{ display: "flex", gap: "6px" }}>
+          {extractedTasks.map((t, i) => (
+            <div key={i} className="ql-prev-item" onClick={() => toggleExtractedTask(i)}>
+              <span className={`ql-prev-check${selectedTasks.has(i) ? " on" : ""}`}>
+                {selectedTasks.has(i) && <span>✓</span>}
+              </span>
+              <span className="ql-prev-txt">{t}</span>
+            </div>
+          ))}
+          <div className="ql-prev-actions">
+            <button
+              className="btn btn-primary"
+              disabled={saving || selectedTasks.size === 0}
+              onClick={confirmExtractedTasks}
+            >
+              {saving ? "Saving..." : `Add ${selectedTasks.size} task${selectedTasks.size !== 1 ? "s" : ""}`}
+            </button>
+            <button
+              className="btn btn-ghost"
+              onClick={() => { setExtractedTasks([]); setSelectedTasks(new Set()); setExtractState("idle"); }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <form className="wt-log" onSubmit={addTask}>
+          <div className={`wt-log-input${logActive ? " is-active" : ""}`} onClick={() => setLogActive(true)}>
             <input
+              className="wt-log-field"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder={
-                extractState === "extracting"
-                  ? "Extracting tasks..."
-                  : "+ Quick log a website task…"
-              }
+              onFocus={() => setLogActive(true)}
+              onBlur={() => { if (!newTitle) setLogActive(false); }}
+              placeholder={extractState === "extracting" ? "Extracting tasks…" : "+ website task…"}
               disabled={extractState === "extracting"}
-              style={{
-                flex: 1,
-                background: "var(--panel-2)",
-                border: "1px solid var(--line)",
-                borderRadius: "6px",
-                padding: "6px 10px",
-                fontSize: "11px",
-                color: "var(--tx-2)",
-                outline: "none",
-                fontFamily: "inherit",
-                transition: "border-color 0.15s",
-              }}
-              onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)"; }}
-              onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
             />
-            <button
-              type="button"
-              onClick={() => setIsBlocking((b) => !b)}
-              style={{
-                padding: "6px 8px",
-                borderRadius: "6px",
-                border: `1px solid ${isBlocking ? "rgba(236,106,82,0.45)" : "var(--line-2)"}`,
-                background: isBlocking ? "rgba(236,106,82,0.12)" : "transparent",
-                color: isBlocking ? "var(--danger)" : "var(--tx-3)",
-                fontSize: "10px",
-                cursor: "pointer",
-                transition: "all 0.15s",
-                flexShrink: 0,
-              }}
-            >
-              blocking
-            </button>
-            <button
-              type="submit"
-              disabled={extractState === "extracting"}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                background: "var(--accent)",
-                border: "none",
-                color: "#fff",
-                fontSize: "11px",
-                cursor: "pointer",
-                fontFamily: "inherit",
-                flexShrink: 0,
-              }}
-            >
-              Add
-            </button>
-          </form>
-        )}
-      </div>
+          </div>
+          {logActive && (
+            <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                style={{
+                  padding: "5px 10px", fontSize: "10px",
+                  borderColor: isBlocking ? "rgba(236,106,82,0.45)" : undefined,
+                  color: isBlocking ? "var(--danger)" : undefined,
+                  background: isBlocking ? "var(--danger-tint)" : undefined,
+                }}
+                onClick={() => setIsBlocking((b) => !b)}
+              >
+                blocking
+              </button>
+              <button type="submit" className="btn btn-primary btn-sm" disabled={extractState === "extracting"}>
+                Add
+              </button>
+            </div>
+          )}
+        </form>
+      )}
     </div>
   );
 }
