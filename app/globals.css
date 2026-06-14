@@ -201,6 +201,10 @@ input { font: inherit; }
 .ql-prev-check.on { background: var(--accent); border-color: var(--accent); }
 .ql-prev-txt { font-size: 12px; line-height: 1.4; color: var(--tx); }
 .ql-prev-actions { display: flex; gap: 8px; padding: 11px 13px; }
+.ql-prev-area { margin-left: auto; font-size: 9px; font-family: var(--font-mono); color: var(--accent-bright); background: var(--accent-tint); border: 1px solid var(--accent-line); border-radius: 5px; padding: 2px 7px; align-self: center; white-space: nowrap; }
+.ql-routed { display: flex; align-items: center; gap: 6px; margin-top: 7px; padding: 6px 10px; border-radius: 8px; background: var(--accent-tint); border: 1px solid var(--accent-line); font-size: 11px; color: var(--tx-2); }
+.ql-routed svg { width: 13px; height: 13px; color: var(--accent-bright); }
+.ql-routed b { color: var(--accent-bright); font-weight: 600; }
 
 /* tools zone — full sidebar height, no border-top */
 .tools-zone {

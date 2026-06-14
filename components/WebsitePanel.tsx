@@ -81,6 +81,12 @@ export default function WebsitePanel() {
         priority: isBlocking ? "blocking" : "normal",
       }),
     });
+    // fire-and-forget: reclassify any general tasks that now match "website"
+    fetch("/api/tasks/reroute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ area: "website" }),
+    }).catch(() => {});
   }
 
   async function addTask(e: React.FormEvent) {

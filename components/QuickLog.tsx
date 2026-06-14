@@ -1,24 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Sparkles, Check } from "lucide-react";
+import { Plus, Sparkles, Check, ArrowRight } from "lucide-react";
 
 type Props = { onTaskAdded: () => void };
 type ExtractState = "idle" | "extracting" | "preview";
+
+async function classifyTask(title: string): Promise<string> {
+  try {
+    const res = await fetch("/api/classify-task", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    });
+    const data = await res.json();
+    return (data as { area?: string }).area ?? "general";
+  } catch {
+    return "general";
+  }
+}
+
+const AREA_LABELS: Record<string, string> = {
+  website: "Website",
+  content: "Content",
+  outbound: "Outbound",
+};
 
 export default function QuickLog({ onTaskAdded }: Props) {
   const [value, setValue] = useState("");
   const [active, setActive] = useState(false);
   const [extractState, setExtractState] = useState<ExtractState>("idle");
-  const [extractedTasks, setExtractedTasks] = useState<string[]>([]);
+  const [extractedTasks, setExtractedTasks] = useState<Array<{ title: string; area: string }>>([]);
   const [selectedTasks, setSelectedTasks] = useState<Set<number>>(new Set());
   const [saving, setSaving] = useState(false);
+  const [routedTo, setRoutedTo] = useState<string | null>(null);
+
+  async function saveTask(title: string, area: string) {
+    await fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, source: "manual", area }),
+    });
+  }
 
   async function handleSubmit() {
     if (!value.trim()) return;
 
     if (value.trim().length < 60) {
-      await saveTask(value.trim());
+      const area = await classifyTask(value.trim());
+      await saveTask(value.trim(), area);
+      if (area !== "general") {
+        setRoutedTo(area);
+        setTimeout(() => setRoutedTo(null), 2500);
+      }
       setValue("");
       setActive(false);
       onTaskAdded();
@@ -33,10 +67,18 @@ export default function QuickLog({ onTaskAdded }: Props) {
         body: JSON.stringify({ text: value.trim() }),
       });
       const data = await res.json();
-      const tasks: string[] = Array.isArray(data.tasks) ? data.tasks : [value.trim()];
+      const titles: string[] = Array.isArray(data.tasks) ? data.tasks : [value.trim()];
+
+      // classify all extracted tasks in parallel
+      const areas = await Promise.all(titles.map((t) => classifyTask(t)));
+      const tasks = titles.map((title, i) => ({ title, area: areas[i] }));
 
       if (tasks.length === 1) {
-        await saveTask(tasks[0]);
+        await saveTask(tasks[0].title, tasks[0].area);
+        if (tasks[0].area !== "general") {
+          setRoutedTo(tasks[0].area);
+          setTimeout(() => setRoutedTo(null), 2500);
+        }
         setValue("");
         setActive(false);
         setExtractState("idle");
@@ -47,7 +89,8 @@ export default function QuickLog({ onTaskAdded }: Props) {
         setExtractState("preview");
       }
     } catch {
-      await saveTask(value.trim());
+      const area = await classifyTask(value.trim());
+      await saveTask(value.trim(), area);
       setValue("");
       setActive(false);
       setExtractState("idle");
@@ -55,18 +98,15 @@ export default function QuickLog({ onTaskAdded }: Props) {
     }
   }
 
-  async function saveTask(title: string) {
-    await fetch("/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, source: "manual" }),
-    });
-  }
-
   async function confirmTasks() {
     setSaving(true);
     const toSave = extractedTasks.filter((_, i) => selectedTasks.has(i));
-    await Promise.all(toSave.map((title) => saveTask(title)));
+    await Promise.all(toSave.map((t) => saveTask(t.title, t.area)));
+    const nonGeneral = toSave.filter((t) => t.area !== "general");
+    if (nonGeneral.length > 0) {
+      setRoutedTo(nonGeneral[0].area);
+      setTimeout(() => setRoutedTo(null), 2500);
+    }
     setValue("");
     setActive(false);
     setExtractedTasks([]);
@@ -96,7 +136,7 @@ export default function QuickLog({ onTaskAdded }: Props) {
         <Plus />
         <input
           className="ql-field"
-          placeholder={isExtracting ? "Extracting tasks…" : "+ Quick log a task…"}
+          placeholder={isExtracting ? "Classifying tasks…" : "+ Quick log a task…"}
           value={value}
           disabled={isExtracting}
           onChange={(e) => setValue(e.target.value)}
@@ -114,7 +154,15 @@ export default function QuickLog({ onTaskAdded }: Props) {
           </button>
         )}
       </div>
-      {!active && (
+
+      {routedTo && (
+        <div className="ql-routed">
+          <ArrowRight />
+          Routed to <b>{AREA_LABELS[routedTo] ?? routedTo}</b>
+        </div>
+      )}
+
+      {!active && !routedTo && (
         <div className="ql-hint">short → 1 task · long/rambling → AI splits into many</div>
       )}
 
@@ -126,15 +174,14 @@ export default function QuickLog({ onTaskAdded }: Props) {
             <span className="mono" style={{ color: "var(--tx-3)", fontSize: 10 }}>· confirm</span>
           </div>
           {extractedTasks.map((t, i) => (
-            <div
-              key={i}
-              className="ql-prev-item"
-              onClick={() => toggleTask(i)}
-            >
+            <div key={i} className="ql-prev-item" onClick={() => toggleTask(i)}>
               <span className={`ql-prev-check${selectedTasks.has(i) ? " on" : ""}`}>
                 {selectedTasks.has(i) && <Check />}
               </span>
-              <span className="ql-prev-txt">{t}</span>
+              <span className="ql-prev-txt">{t.title}</span>
+              {t.area !== "general" && (
+                <span className="ql-prev-area">{AREA_LABELS[t.area] ?? t.area}</span>
+              )}
             </div>
           ))}
           <div className="ql-prev-actions">

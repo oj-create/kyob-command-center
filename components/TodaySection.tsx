@@ -24,7 +24,7 @@ export default function TodaySection() {
   const [doneToday, setDoneToday] = useState(0);
 
   const fetchTasks = useCallback(async () => {
-    const res = await fetch("/api/tasks");
+    const res = await fetch("/api/tasks?area=general");
     const data = await res.json();
     setTasks(Array.isArray(data) ? data : []);
   }, []);
