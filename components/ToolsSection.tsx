@@ -65,40 +65,138 @@ export default function ToolsSection() {
 
   return (
     <>
-      <div className="flex flex-col gap-2">
+      {/* Zone header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "12px 14px 8px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ fontSize: "11px", color: "var(--tx-3)" }}>⚙</span>
+          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--tx)" }}>
+            Tools
+          </span>
+        </div>
+        <span
+          style={{
+            fontSize: "10px",
+            color: "var(--tx-3)",
+            fontFamily: '"Geist Mono", ui-monospace',
+          }}
+        >
+          {tools.length} skills
+        </span>
+      </div>
+
+      {/* Search */}
+      <div style={{ padding: "0 10px 8px" }}>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search tools..."
-          className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white placeholder-white/30 focus:outline-none focus:border-purple-500"
+          placeholder={`Filter ${tools.length} tools…`}
+          style={{
+            width: "100%",
+            background: "var(--panel-2)",
+            border: "1px solid var(--line)",
+            borderRadius: "6px",
+            padding: "6px 10px",
+            fontSize: "11px",
+            color: "var(--tx-2)",
+            outline: "none",
+            boxSizing: "border-box",
+            fontFamily: "inherit",
+            transition: "border-color 0.15s",
+          }}
+          onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)"; }}
+          onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
         />
+      </div>
+
+      {/* Tool list */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 4px 12px" }}>
         {Object.entries(grouped).map(([category, categoryTools]) => (
-          <div key={category}>
-            <p className="text-[9px] text-white/25 uppercase tracking-widest mt-2 mb-0.5 px-1">
-              {category}
-            </p>
+          <div key={category} style={{ marginBottom: "4px" }}>
+            <div
+              style={{
+                padding: "4px 10px 2px",
+                fontSize: "9px",
+                color: "var(--tx-3)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>{category}</span>
+              <span style={{ fontFamily: '"Geist Mono", ui-monospace' }}>
+                {categoryTools.length}
+              </span>
+            </div>
             {categoryTools.map((tool) => (
               <button
                 key={tool.name}
                 onClick={() => setSelected(tool)}
-                className="w-full text-left px-2 py-1 rounded hover:bg-white/5 transition-colors group"
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "6px 10px",
+                  borderRadius: "6px",
+                  background: selected?.name === tool.name ? "var(--accent-tint)" : "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "8px",
+                  transition: "background 0.1s",
+                }}
+                onMouseEnter={(e) => {
+                  if (selected?.name !== tool.name)
+                    (e.currentTarget as HTMLElement).style.background = "var(--panel-2)";
+                }}
+                onMouseLeave={(e) => {
+                  if (selected?.name !== tool.name)
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                }}
               >
-                <p className="text-xs text-white/60 group-hover:text-white/90 leading-snug">
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: selected?.name === tool.name ? "var(--accent-bright)" : "var(--tx-2)",
+                    lineHeight: 1.3,
+                    transition: "color 0.1s",
+                  }}
+                >
                   {tool.name}
-                </p>
+                </span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    color: "var(--tx-3)",
+                    opacity: 0,
+                    transition: "opacity 0.1s",
+                    flexShrink: 0,
+                  }}
+                  className="chev"
+                >
+                  ›
+                </span>
               </button>
             ))}
           </div>
         ))}
         {filtered.length === 0 && (
-          <p className="text-xs text-white/25 px-1">No tools found</p>
+          <div style={{ padding: "16px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: "12px", color: "var(--tx-3)" }}>No tools match</div>
+          </div>
         )}
       </div>
-      <ToolDrawer
-        tool={selected}
-        onClose={() => setSelected(null)}
-        onLaunch={handleLaunch}
-      />
+
+      <ToolDrawer tool={selected} onClose={() => setSelected(null)} onLaunch={handleLaunch} />
     </>
   );
 }

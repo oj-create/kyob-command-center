@@ -19,7 +19,6 @@ export default function QuickLog({ onTaskAdded }: Props) {
     e.preventDefault();
     if (!value.trim()) return;
 
-    // Short input: save directly as one task
     if (value.trim().length < 60) {
       await saveTask(value.trim());
       setValue("");
@@ -27,7 +26,6 @@ export default function QuickLog({ onTaskAdded }: Props) {
       return;
     }
 
-    // Long input: extract tasks
     setExtractState("extracting");
     try {
       const res = await fetch("/api/extract-tasks", {
@@ -39,19 +37,16 @@ export default function QuickLog({ onTaskAdded }: Props) {
       const tasks: string[] = Array.isArray(data.tasks) ? data.tasks : [value.trim()];
 
       if (tasks.length === 1) {
-        // Only one task found -- save directly
         await saveTask(tasks[0]);
         setValue("");
         setExtractState("idle");
         onTaskAdded();
       } else {
-        // Multiple tasks -- show preview
         setExtractedTasks(tasks);
         setSelectedTasks(new Set(tasks.map((_, i) => i)));
         setExtractState("preview");
       }
     } catch {
-      // Fallback: save as single task
       await saveTask(value.trim());
       setValue("");
       setExtractState("idle");
@@ -96,36 +91,92 @@ export default function QuickLog({ onTaskAdded }: Props) {
 
   if (extractState === "preview") {
     return (
-      <div className="bg-white/5 border border-purple-500/30 rounded-lg p-3">
-        <p className="text-[10px] text-purple-400 uppercase tracking-widest mb-2">
-          Found {extractedTasks.length} tasks
-        </p>
-        <div className="flex flex-col gap-1 mb-3">
+      <div
+        style={{
+          background: "var(--panel-2)",
+          border: "1px solid var(--accent-line)",
+          borderRadius: "8px",
+          padding: "10px 12px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+          <span style={{ fontSize: "11px", color: "var(--accent-bright)" }}>✦</span>
+          <span style={{ fontSize: "11px", fontWeight: 600, color: "var(--tx)" }}>
+            Found {extractedTasks.length} tasks
+          </span>
+          <span style={{ fontSize: "10px", color: "var(--tx-3)", marginLeft: "2px" }}>· confirm</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
           {extractedTasks.map((task, i) => (
-            <label key={i} className="flex items-start gap-2 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={selectedTasks.has(i)}
-                onChange={() => toggleTask(i)}
-                className="mt-0.5 accent-purple-500 flex-shrink-0"
-              />
-              <span className="text-xs text-white/80 leading-snug">{task}</span>
-            </label>
+            <div
+              key={i}
+              onClick={() => toggleTask(i)}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "8px",
+                cursor: "pointer",
+                padding: "4px 0",
+              }}
+            >
+              <div
+                style={{
+                  width: "13px",
+                  height: "13px",
+                  borderRadius: "3px",
+                  border: `1px solid ${selectedTasks.has(i) ? "var(--accent)" : "var(--line-2)"}`,
+                  background: selectedTasks.has(i) ? "var(--accent)" : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  marginTop: "1px",
+                  transition: "background 0.15s",
+                }}
+              >
+                {selectedTasks.has(i) && (
+                  <span style={{ fontSize: "8px", color: "#fff" }}>✓</span>
+                )}
+              </div>
+              <span style={{ fontSize: "11px", color: "var(--tx-2)", lineHeight: 1.4 }}>{task}</span>
+            </div>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div style={{ display: "flex", gap: "6px" }}>
           <button
             onClick={confirmTasks}
             disabled={saving || selectedTasks.size === 0}
-            className="flex-1 bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-xs py-1.5 rounded transition-colors"
+            style={{
+              flex: 1,
+              padding: "6px 10px",
+              borderRadius: "6px",
+              background: "var(--accent)",
+              border: "none",
+              color: "#fff",
+              fontSize: "11px",
+              fontWeight: 500,
+              cursor: saving || selectedTasks.size === 0 ? "not-allowed" : "pointer",
+              opacity: saving || selectedTasks.size === 0 ? 0.4 : 1,
+              transition: "background 0.15s",
+            }}
           >
-            {saving ? "Saving..." : `Add ${selectedTasks.size} task${selectedTasks.size !== 1 ? "s" : ""}`}
+            {saving
+              ? "Saving..."
+              : `Add ${selectedTasks.size} task${selectedTasks.size !== 1 ? "s" : ""}`}
           </button>
           <button
             onClick={cancelPreview}
-            className="text-xs text-white/30 hover:text-white/60 px-2"
+            style={{
+              padding: "6px 10px",
+              borderRadius: "6px",
+              background: "transparent",
+              border: "1px solid var(--line-2)",
+              color: "var(--tx-3)",
+              fontSize: "11px",
+              cursor: "pointer",
+            }}
           >
-            cancel
+            Cancel
           </button>
         </div>
       </div>
@@ -133,14 +184,51 @@ export default function QuickLog({ onTaskAdded }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ position: "relative" }}>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={extractState === "extracting" ? "Extracting tasks..." : "+ Quick log a task..."}
+        placeholder={
+          extractState === "extracting" ? "Extracting tasks..." : "+ Quick log a task..."
+        }
         disabled={extractState === "extracting"}
-        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:border-purple-500 disabled:opacity-50"
+        style={{
+          width: "100%",
+          background: "var(--panel-2)",
+          border: "1px solid var(--line)",
+          borderRadius: "7px",
+          padding: "7px 60px 7px 10px",
+          fontSize: "11px",
+          color: "var(--tx-2)",
+          outline: "none",
+          boxSizing: "border-box",
+          fontFamily: "inherit",
+          transition: "border-color 0.15s",
+        }}
+        onFocus={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-line)"; }}
+        onBlur={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "var(--line)"; }}
       />
+      {value.length > 0 && extractState === "idle" && (
+        <button
+          type="submit"
+          style={{
+            position: "absolute",
+            right: "6px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            padding: "3px 8px",
+            borderRadius: "4px",
+            background: "var(--accent-tint)",
+            border: "1px solid var(--accent-line)",
+            color: "var(--accent-bright)",
+            fontSize: "10px",
+            cursor: "pointer",
+            fontWeight: 500,
+          }}
+        >
+          {value.length >= 60 ? "Extract" : "Add"}
+        </button>
+      )}
     </form>
   );
 }

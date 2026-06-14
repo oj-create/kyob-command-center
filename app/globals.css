@@ -1,10 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
 :root {
   --sidebar-width: 280px;
+  --bg: #0e0f14;
+  --bg-2: #121319;
+  --panel: #16171d;
+  --panel-2: #1b1c23;
+  --elev: #212229;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.12);
+  --line-3: rgba(255, 255, 255, 0.18);
+  --tx: rgba(255, 255, 255, 0.92);
+  --tx-2: rgba(255, 255, 255, 0.58);
+  --tx-3: rgba(255, 255, 255, 0.34);
+  --accent: #6e5cf0;
+  --accent-bright: #9a8cff;
+  --accent-deep: #5b4be1;
+  --accent-tint: rgba(110, 92, 240, 0.15);
+  --accent-line: rgba(110, 92, 240, 0.45);
+  --accent-glow: rgba(110, 92, 240, 0.28);
+  --fathom: #5c95f7;
+  --fathom-tint: rgba(92, 149, 247, 0.15);
+  --slack: #41c281;
+  --slack-tint: rgba(65, 194, 129, 0.15);
+  --manual-col: #9a9aa6;
+  --manual-tint: rgba(154, 154, 166, 0.12);
+  --warn: #e3a53a;
+  --danger: #ec6a52;
 }
 
 body {
-  background: #0f0f1a;
-  color: #e2e2f0;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
 }

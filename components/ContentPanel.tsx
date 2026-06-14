@@ -10,145 +10,175 @@ type Post = {
   platform: string;
 };
 
-const STATUS_BADGE: Record<string, string> = {
-  draft: "bg-yellow-500/20 text-yellow-300",
-  scheduled: "bg-blue-500/20 text-blue-300",
-  published: "bg-green-500/20 text-green-300",
+const STATUS_DOT: Record<string, string> = {
+  draft: "var(--warn)",
+  scheduled: "var(--fathom)",
+  published: "var(--slack)",
 };
 
-const REPURPOSE_ITEMS = [
-  { key: "linkedin", label: "Engage on LinkedIn (comments + replies)" },
-  { key: "atlassian", label: "Post to Atlassian Community" },
-  { key: "youtube", label: "Post to YouTube Community" },
-];
+const STATUS_BADGE: Record<string, { bg: string; color: string }> = {
+  draft: { bg: "rgba(227,165,58,0.12)", color: "var(--warn)" },
+  scheduled: { bg: "var(--fathom-tint)", color: "var(--fathom)" },
+  published: { bg: "var(--slack-tint)", color: "var(--slack)" },
+};
 
-function RepurposeChecklist() {
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const storageKey = `repurpose-${todayKey}`;
-
-  const [checked, setChecked] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set();
-    try {
-      const saved = localStorage.getItem(storageKey);
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
-
-  function toggle(key: string) {
-    setChecked((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify([...next]));
-      } catch {}
-      return next;
-    });
-  }
-
-  const allDone = checked.size === REPURPOSE_ITEMS.length;
-
-  return (
-    <div className={`rounded-lg border p-3 mb-4 ${allDone ? "border-green-500/20 bg-green-500/5" : "border-purple-500/20 bg-purple-500/5"}`}>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] text-purple-400 uppercase tracking-widest">
-          Repurpose by 4pm
-        </p>
-        {allDone && (
-          <span className="text-[10px] text-green-400">Done today</span>
-        )}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        {REPURPOSE_ITEMS.map((item) => (
-          <label key={item.key} className="flex items-center gap-2 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={checked.has(item.key)}
-              onChange={() => toggle(item.key)}
-              className="accent-purple-500 flex-shrink-0"
-            />
-            <span className={`text-xs transition-colors ${checked.has(item.key) ? "line-through text-white/25" : "text-white/70 group-hover:text-white/90"}`}>
-              {item.label}
-            </span>
-          </label>
-        ))}
-      </div>
-    </div>
-  );
-}
+const TABS = ["All", "Draft", "Scheduled", "Published"];
 
 export default function ContentPanel() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [filter, setFilter] = useState<string>("all");
+  const [filter, setFilter] = useState("All");
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/posts")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          setFetchError(data.error ?? "Failed to load posts");
-        }
+        if (Array.isArray(data)) setPosts(data);
+        else setFetchError(data.error ?? "Failed to load posts");
       })
       .catch(() => setFetchError("Failed to load posts"));
   }, []);
 
   const filtered =
-    filter === "all" ? posts : posts.filter((p) => p.status === filter);
+    filter === "All" ? posts : posts.filter((p) => p.status === filter.toLowerCase());
 
   return (
-    <div className="rounded-xl bg-[#1e1e35] border border-white/10 p-5">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-purple-400 uppercase tracking-widest">Content</p>
-        <div className="flex gap-1">
-          {["all", "draft", "scheduled", "published"].map((s) => (
+    <div
+      style={{
+        background: "var(--panel)",
+        border: "1px solid var(--line)",
+        borderRadius: "10px",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "14px 16px 12px",
+          borderBottom: "1px solid var(--line)",
+        }}
+      >
+        <span style={{ fontSize: "13px" }}>✏</span>
+        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--tx)", flex: 1 }}>
+          Content
+        </span>
+        {/* Filter tabs */}
+        <div style={{ display: "flex", gap: "2px" }}>
+          {TABS.map((tab) => (
             <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`text-[10px] px-2 py-0.5 rounded capitalize transition-colors ${
-                filter === s
-                  ? "bg-purple-500/30 text-purple-300"
-                  : "text-white/30 hover:text-white/60"
-              }`}
+              key={tab}
+              onClick={() => setFilter(tab)}
+              style={{
+                padding: "3px 8px",
+                borderRadius: "5px",
+                background: filter === tab ? "var(--accent-tint)" : "transparent",
+                border: `1px solid ${filter === tab ? "var(--accent-line)" : "transparent"}`,
+                color: filter === tab ? "var(--accent-bright)" : "var(--tx-3)",
+                fontSize: "10px",
+                cursor: "pointer",
+                fontWeight: filter === tab ? 500 : 400,
+                transition: "background 0.15s, color 0.15s",
+              }}
             >
-              {s}
+              {tab}
             </button>
           ))}
         </div>
       </div>
-      <RepurposeChecklist />
-      {fetchError ? (
-        <p className="text-white/30 text-sm">Posts unavailable</p>
-      ) : filtered.length === 0 ? (
-        <p className="text-white/30 text-sm">No posts in queue</p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {filtered.map((post) => (
-            <div key={post.id} className="flex items-center justify-between gap-3">
-              <p className="text-sm text-white/80 truncate flex-1">{post.title}</p>
-              <span
-                className={`text-[10px] px-1.5 py-0.5 rounded flex-shrink-0 ${
-                  STATUS_BADGE[post.status] ?? STATUS_BADGE.draft
-                }`}
-              >
-                {post.status}
-              </span>
-              {post.scheduledDate && (
-                <span className="text-[10px] text-white/30 flex-shrink-0">
-                  {new Date(post.scheduledDate).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-              )}
+
+      {/* Post list */}
+      <div style={{ padding: "8px 0" }}>
+        {fetchError ? (
+          <div style={{ padding: "12px 16px", fontSize: "12px", color: "var(--tx-3)" }}>
+            Posts unavailable
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: "16px", textAlign: "center" }}>
+            <div style={{ fontSize: "12px", color: "var(--tx-3)" }}>
+              No {filter.toLowerCase()} posts
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          filtered.map((post) => {
+            const dot = STATUS_DOT[post.status] ?? "var(--manual-col)";
+            const badge = STATUS_BADGE[post.status] ?? { bg: "var(--manual-tint)", color: "var(--manual-col)" };
+            return (
+              <div
+                key={post.id}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  padding: "9px 16px",
+                  borderBottom: "1px solid var(--line)",
+                  transition: "background 0.1s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--panel-2)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+              >
+                <span
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: dot,
+                    flexShrink: 0,
+                    marginTop: "5px",
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "var(--tx)",
+                      lineHeight: 1.4,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    {post.title}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        padding: "1px 6px",
+                        borderRadius: "4px",
+                        background: badge.bg,
+                        color: badge.color,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {post.status}
+                    </span>
+                    {post.scheduledDate && (
+                      <span
+                        style={{
+                          fontSize: "10px",
+                          color: "var(--tx-3)",
+                          fontFamily: '"Geist Mono", ui-monospace',
+                        }}
+                      >
+                        {new Date(post.scheduledDate).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

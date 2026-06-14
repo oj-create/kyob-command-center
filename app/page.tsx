@@ -1,38 +1,33 @@
 import Sidebar from "@/components/Sidebar";
 import TodaySection from "@/components/TodaySection";
-import OutboundPanel from "@/components/OutboundPanel";
-import ContentPanel from "@/components/ContentPanel";
-import WebsitePanel from "@/components/WebsitePanel";
 import ToolsSection from "@/components/ToolsSection";
+import OrientBar from "@/components/OrientBar";
+import RepurposeRitual from "@/components/RepurposeRitual";
+import BoardSection from "@/components/BoardSection";
 
 export default function Dashboard() {
   return (
-    <div className="flex min-h-screen">
+    <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar>
-        <div>
-          <p className="text-xs text-white/40 uppercase tracking-widest">Quick Tasks</p>
-          <p className="text-[10px] text-white/20 mt-0.5">personal &amp; ad-hoc</p>
-        </div>
         <TodaySection />
-        <p className="text-xs text-white/40 uppercase tracking-widest mt-4">Tools</p>
         <ToolsSection />
       </Sidebar>
 
       <main
-        style={{ marginLeft: "var(--sidebar-width)" }}
-        className="flex-1 p-6 flex flex-col gap-6"
+        style={{
+          marginLeft: "var(--sidebar-width)",
+          flex: 1,
+          padding: "24px 28px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px",
+          maxWidth: "calc(100vw - var(--sidebar-width))",
+          boxSizing: "border-box",
+        }}
       >
-        <h1 className="text-lg font-semibold text-white/80">
-          {new Date().toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-          })}
-        </h1>
-        <p className="text-[10px] text-white/25 uppercase tracking-widest -mt-4">Focus Areas</p>
-        <OutboundPanel />
-        <ContentPanel />
-        <WebsitePanel />
+        <OrientBar />
+        <RepurposeRitual />
+        <BoardSection />
       </main>
     </div>
   );
