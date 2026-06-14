@@ -29,9 +29,7 @@ export default function TodaySection() {
     setTasks(Array.isArray(data) ? data : []);
   }, []);
 
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
   async function handleComplete(id: string) {
     await fetch(`/api/tasks/${id}`, {
@@ -52,42 +50,32 @@ export default function TodaySection() {
   const pct = total > 0 ? Math.min(100, Math.round((doneToday / total) * 100)) : 0;
 
   return (
-    <div className="tasks-zone">
-      <div className="zone-head">
-        <div className="zone-title">
-          <ListChecks />
-          Tasks
-        </div>
-        <div className="zone-count">{tasks.length} open</div>
+    <div className="panel tasks-panel">
+      <div className="panel-head">
+        <span className="sec-ico"><ListChecks /></span>
+        <span className="panel-title">Tasks</span>
+        <span className="panel-sub">{tasks.length} open · never auto-deletes</span>
       </div>
 
-      <div className="progress-wrap">
+      <div className="tasks-progress">
         <div className="progress-row">
-          <span className="progress-num">
-            <b>{doneToday}</b> of {total} done today
-          </span>
+          <span className="progress-num"><b>{doneToday}</b> of {total} done today</span>
           <span className="progress-num">{pct}%</span>
         </div>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${pct}%` }} />
         </div>
         <div className="progress-meta">
-          {overdueCount > 0 && (
-            <span className="chip-stat">
-              <span className="chip-dot warn" />
-              {overdueCount} overdue
-            </span>
-          )}
-          {blockingCount > 0 && (
-            <span className="chip-stat">
-              <span className="chip-dot danger" />
-              {blockingCount} blocking
-            </span>
-          )}
+          <span className="chip-stat">
+            <span className="chip-dot warn" />{overdueCount} overdue
+          </span>
+          <span className="chip-stat">
+            <span className="chip-dot danger" />{blockingCount} blocking
+          </span>
         </div>
       </div>
 
-      <div className="task-scroll">
+      <div className="tasks-list">
         {tasks.length === 0 ? (
           <div className="task-empty">
             <div style={{ fontSize: 22, marginBottom: 9, color: "var(--accent-bright)" }}>☕</div>

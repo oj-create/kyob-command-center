@@ -12,8 +12,10 @@ function getWeekNumber(d: Date): number {
 
 export default function OrientBar() {
   const [taskCount, setTaskCount] = useState<number | null>(null);
+  const [overdueCount, setOverdueCount] = useState<number | null>(null);
   const [scheduledCount, setScheduledCount] = useState<number | null>(null);
   const [repurposeDone, setRepurposeDone] = useState(0);
+  const [doneToday, setDoneToday] = useState(0);
 
   const now = new Date();
   const todayKey = now.toISOString().slice(0, 10);
@@ -28,7 +30,16 @@ export default function OrientBar() {
   useEffect(() => {
     fetch("/api/tasks")
       .then((r) => r.json())
-      .then((data) => { if (Array.isArray(data)) setTaskCount(data.length); })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setTaskCount(data.length);
+          const overdue = data.filter((t: { createdAt: string }) => {
+            const age = Date.now() - new Date(t.createdAt).getTime();
+            return age > 86400000 * 2;
+          }).length;
+          setOverdueCount(overdue);
+        }
+      })
       .catch(() => {});
 
     fetch("/api/posts")
@@ -56,22 +67,26 @@ export default function OrientBar() {
           {taskCount !== null
             ? ` — ${taskCount} task${taskCount !== 1 ? "s" : ""} open`
             : ""}
+          {overdueCount ? `, ` : ""}
+          {overdueCount ? <b>{overdueCount} overdue</b> : null}
           . HeyReach not checked yet.
         </div>
       </div>
       <div className="momentum">
         <div className="mo accent">
-          <div className="mo-num">{taskCount ?? "—"}</div>
-          <div className="mo-lbl">Tasks open</div>
+          <div className="mo-num">{doneToday}<small> / 8</small></div>
+          <div className="mo-lbl">Tasks done</div>
+        </div>
+        <div className="mo">
+          <div className="mo-num">{overdueCount ?? "—"}</div>
+          <div className="mo-lbl">Overdue</div>
         </div>
         <div className="mo">
           <div className="mo-num">{scheduledCount ?? "—"}</div>
           <div className="mo-lbl">Posts queued</div>
         </div>
         <div className="mo">
-          <div className="mo-num">
-            {repurposeDone}<small> / 3</small>
-          </div>
+          <div className="mo-num">{repurposeDone}<small> / 3</small></div>
           <div className="mo-lbl">Repurpose</div>
         </div>
       </div>
